@@ -12,8 +12,6 @@ import pandas as pd
 python3 code/preprocessing/load_from_dropbox.py https://achrafothman.net/site/english-asl-gloss-parallel-corpus-2012-aslg-pc12/ code/data/corpus.csv
 """
 
-from evaluate import compute_bleu
-
 
 def get_dropbox_links(url):
     # make a GET request to the webpage
@@ -100,6 +98,7 @@ def main(url, csv_output_path):
     
     with open(csv_output_path, 'w', newline='', encoding='utf-8') as new_csv_file:
         pass
+
 
     # get the links to dropbox located at the given url
     dropbox_links = get_dropbox_links(url)

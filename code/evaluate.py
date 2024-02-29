@@ -21,11 +21,11 @@ def compute_bleu(hypotheses, references):
     return bleu_score
 
 
-def main():
-    df = pd.read_csv('code/data/corpus.csv', dtype=str)
+def main(filepath="code/data/corpus.csv"):
+    df = pd.read_csv(filepath, dtype=str)
     df.fillna('', inplace=True)
-    hypotheses = df.iloc[0:1000, 0]
-    references = df.iloc[0:1000, 1]
+    hypotheses = df.iloc[:, 0]
+    references = df.iloc[:, 1]
                   
     bleu_score = compute_bleu(hypotheses, [references])
 
