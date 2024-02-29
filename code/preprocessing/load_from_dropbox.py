@@ -5,6 +5,7 @@ from zipfile import ZipFile
 from io import BytesIO
 import sys
 import csv
+import os
 
 """
 python3 code/preprocessing/load_from_dropbox.py https://achrafothman.net/site/english-asl-gloss-parallel-corpus-2012-aslg-pc12/ code/data/corpus.csv
@@ -39,7 +40,6 @@ def get_txt_from_dropbox(dropbox_link):
 
     if dropbox_link[-1] == "0":
         dropbox_link = dropbox_link[:-1] + "1"
-    print(dropbox_link)
 
     # make a GET request to the download link
     response = requests.get(dropbox_link)
@@ -55,55 +55,54 @@ def get_txt_from_dropbox(dropbox_link):
             # extract and print txt them
             for file_info in zip_file.infolist():
                 with zip_file.open(file_info) as file:
-                    print(file_info.filename)
+                    print("reading " + file_info.filename)
                     content = file.read().decode('utf-8')
                     content = content.rstrip() + '\n'
                     if file_info.filename.endswith("en.txt"):
-                        print("adding en file")
-                        en_text += content
+                        en_text = content
                     elif file_info.filename.endswith("asl.txt"):
-                        print("adding asl file")
-                        asl_text += content
-
-    print(en_text.count('\n'))
-    print(asl_text.count('\n'))
+                        asl_text = content
 
     return en_text, asl_text
 
-def text_to_csv(en_lines, asl_lines, csv_output_path):
+def dropbox_to_csv(dropbox_links, csv_output_path):
 
     # open the txt files and create csv file
-    with (open(csv_output_path, 'w', newline='', encoding='utf-8') as csv_file):
+    with open(csv_output_path, 'a', newline='', encoding='utf-8') as csv_file:
 
-        csv_writer = csv.writer(csv_file)
+        for dropbox_link in dropbox_links:
+            curr_en_text, curr_asl_text = get_txt_from_dropbox(dropbox_link)
+            en_text = curr_en_text
+            asl_text = curr_asl_text
 
-        # combine english and asl lines into CSV
-        for en_line, asl_line in zip(en_lines, asl_lines):
-            en_line = en_line.strip()
-            asl_line = asl_line.strip()
+            # split by '\n' into list of strings
+            en_lines = en_text.splitlines()
+            asl_lines = asl_text.splitlines()
 
-            csv_writer.writerow([en_line, asl_line])
+            csv_writer = csv.writer(csv_file)
+
+            # combine english and asl lines into CSV
+            for en_line, asl_line in zip(en_lines, asl_lines):
+                en_line = en_line.strip()
+                asl_line = asl_line.strip()
+
+                csv_writer.writerow([en_line, asl_line])
 
 
 def main(url, csv_output_path):
+    if os.path.exists(csv_output_path):
+        # if it exists, delete it
+        os.remove(csv_output_path)
+
+    
+    with open(csv_output_path, 'w', newline='', encoding='utf-8') as new_csv_file:
+        pass
 
     # get the links to dropbox located at the given url
     dropbox_links = get_dropbox_links(url)
 
-    # extract txt files from each dropbox link
-    en_text = ""
-    asl_text = ""
-    for dropbox_link in dropbox_links:
-        curr_en_text, curr_asl_text = get_txt_from_dropbox(dropbox_link)
-        en_text += curr_en_text
-        asl_text += curr_asl_text
-
-    # split by '\n' into list of strings
-    en_lines = en_text.splitlines()
-    asl_lines = asl_text.splitlines()
-
-    # list of english and asl lines to csv
-    text_to_csv(en_lines, asl_lines, csv_output_path)
+    # convert txt at each dropbox link to csv
+    dropbox_to_csv(dropbox_links, csv_output_path)
 
 
 if __name__ == "__main__":

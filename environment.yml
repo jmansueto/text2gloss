@@ -73,4 +73,4 @@ dependencies:
       - typing-extensions==4.10.0
       - tzdata==2024.1
       - zipp==3.17.0
-prefix: /home/jennamansueto/miniconda3/envs/text2gloss
+prefix: /home/lukebabbitt/miniconda3/envs/text2gloss
