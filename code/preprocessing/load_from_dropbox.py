@@ -6,10 +6,13 @@ from io import BytesIO
 import sys
 import csv
 import os
+import pandas as pd
 
 """
 python3 code/preprocessing/load_from_dropbox.py https://achrafothman.net/site/english-asl-gloss-parallel-corpus-2012-aslg-pc12/ code/data/corpus.csv
 """
+
+from evaluate import compute_bleu
 
 
 def get_dropbox_links(url):
@@ -70,7 +73,7 @@ def dropbox_to_csv(dropbox_links, csv_output_path):
     # open the txt files and create csv file
     with open(csv_output_path, 'a', newline='', encoding='utf-8') as csv_file:
 
-        for dropbox_link in dropbox_links:
+        for dropbox_link in [dropbox_links[0]]:
             curr_en_text, curr_asl_text = get_txt_from_dropbox(dropbox_link)
             en_text = curr_en_text
             asl_text = curr_asl_text
@@ -103,6 +106,7 @@ def main(url, csv_output_path):
 
     # convert txt at each dropbox link to csv
     dropbox_to_csv(dropbox_links, csv_output_path)
+
 
 
 if __name__ == "__main__":
