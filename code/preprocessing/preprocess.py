@@ -68,15 +68,14 @@ def save_splits(data, outpath, prefix):
     data['asl_gloss'].to_csv(asl_file_path, index=False, header=False)
 
 
-def run_fairseq_preprocess(source_lang="en",
-                           target_lang="asl",
-                           trainpref="data/test_data/raw/splits/train",
-                           validpref="data/test_data/raw/splits/val",
-                           testpref="data/test_data/raw/splits/test",
-                           destdir="data/clean",
-                           workers=1,
-                           tokenizer="moses",
-                           bpe_type="subword_nmt"):
+def run_fairseq_preprocess(pref,
+                        destdir,
+                        source_lang="en",
+                        target_lang="asl",
+                        workers=1,
+                        tokenizer="moses",
+                        bpe_type="subword_nmt",
+                    ):
     """
     Runs the Fairseq preprocess command with the specified parameters.
 
@@ -89,6 +88,10 @@ def run_fairseq_preprocess(source_lang="en",
     destdir (str): Destination directory to store the binary files.
     workers (int): Number of worker processes to use.
     """
+    trainpref = os.path.join(pref, 'train')
+    validpref = os.path.join(pref, 'val')
+    testpref = os.path.join(pref, 'test')
+
     if not os.path.exists(destdir):
         os.makedirs(destdir)
 
@@ -104,18 +107,26 @@ def run_fairseq_preprocess(source_lang="en",
 
 
 """
-RECOMMENDED FILE STRUCTURE
-filepath = data/$DATASET_NAME/raw/$DATASET_NAME.csv
-split_outpath = data/$DATASET_NAME/raw/splits/
-final_outpath = data/$DATASET_NAME/clean/
+Automatically gennerates the following file structure:
+--> TEST_DATA (or whatever your folder is called)
+-----> clean
+----------> {output of fairseq preprocess, i.e. tokenized binarized split files}
+-----> splits
+----------> train val test splits (clean but un-tokenized/binarized)
+-----> bpe_codes.txt
 """
 
-def main(filepath = 'data/test_data/raw/test_data.tsv',
-    split_outpath = "data/test_data/raw/splits/",
-    final_outpath = "data/test_data/clean/",
-    bpe_codes_path = "data/test_data/"
+def main(filepath = 'data/test_data/test_data.tsv',
     num_merge_ops=32000
     ):
+
+    base_dir = os.path.dirname(filepath)
+    
+    # Construct the paths dynamically
+    split_outpath = os.path.join(base_dir, "splits/")
+    final_outpath = os.path.join(base_dir, "clean/")
+    bpe_codes_path = base_dir + "/bpe_codes.txt"
+    
 
     data = load_data(filepath)
     data_clean = clean_data(data)
@@ -129,10 +140,9 @@ def main(filepath = 'data/test_data/raw/test_data.tsv',
     save_splits(test, split_outpath, "test")
 
     # Generate BPE codes (based on the training data)
-    bpe_codes_path = os.path.join(bpe_codes_path, "bpe_codes.txt")
     generate_bpe_codes(os.path.join(split_outpath, "train.en"), bpe_codes_path, num_merge_ops)
 
-    run_fairseq_preprocess(destdir=final_outpath)
+    run_fairseq_preprocess(destdir=final_outpath, pref=split_outpath)
 
 
 if __name__ == "__main__":
