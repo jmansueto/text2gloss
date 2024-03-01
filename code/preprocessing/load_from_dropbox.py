@@ -9,6 +9,8 @@ import os
 import pandas as pd
 
 """
+RECOMMENDED STRUCTURE: code/data/$DATASET_NAME/raw/$DATASET_NAME.csv
+
 python3 code/preprocessing/load_from_dropbox.py https://achrafothman.net/site/english-asl-gloss-parallel-corpus-2012-aslg-pc12/ code/data/corpus.csv
 """
 

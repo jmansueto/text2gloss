@@ -83,6 +83,13 @@ def run_fairseq_preprocess(source_lang="en",
         print(f"Error during Fairseq preprocessing: {e}")
 
 
+"""
+RECOMMENDED FILE STRUCTURE
+filepath = data/$DATASET_NAME/raw/$DATASET_NAME.csv
+split_outpath = data/$DATASET_NAME/raw/splits/
+final_outpath = data/$DATASET_NAME/clean/
+"""
+
 def main(filepath = 'data/test_data/raw/test_data.tsv',
     split_outpath = "data/test_data/raw/splits/",
     final_outpath = "data/test_data/clean/"
