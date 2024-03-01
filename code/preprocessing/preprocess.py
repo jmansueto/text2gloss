@@ -6,8 +6,8 @@ from sklearn.model_selection import train_test_split
 from tqdm import tqdm
 
 # Load data from filepath
-def load_data(filepath):
-    data = pd.read_csv(filepath, sep='\t', header=None, names=['english', 'asl_gloss'])
+def load_data_from_csv(filepath):
+    data = pd.read_csv(filepath, sep=',', header=None, names=['asl_gloss', 'english'])
     return data
 
 # generate bpe codes
@@ -116,11 +116,13 @@ Automatically gennerates the following file structure:
 -----> bpe_codes.txt
 """
 
-def main(filepath = 'data/test_data/test_data.tsv',
+def main(filepath = 'data/aslg_pc12/aslg_pc12.csv',
     num_merge_ops=32000
     ):
 
     base_dir = os.path.dirname(filepath)
+
+    print(base_dir)
     
     # Construct the paths dynamically
     split_outpath = os.path.join(base_dir, "splits/")
@@ -128,7 +130,7 @@ def main(filepath = 'data/test_data/test_data.tsv',
     bpe_codes_path = base_dir + "/bpe_codes.txt"
     
 
-    data = load_data(filepath)
+    data = load_data_from_csv(filepath)
     data_clean = clean_data(data)
 
     # Split data
