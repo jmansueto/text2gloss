@@ -2,21 +2,23 @@
 
 # to make script executable, run chmod +x train.sh 
 # NOTE TO SELF: MAKE PATHS ABSOLUTE
-DATA='/home/jennamansueto/text2gloss/code/data/test_data/clean/' 
+DATA='/home/jennamansueto/text2gloss/code/data/aslg_pc12/clean/' 
 SRC_LANG='en' #Source Language
 TGT_LANG='asl' #Target Language
+LOG_ROOT_DIR='/home/jennamansueto/text2gloss/code/models/logs'
+LOG_DIR="${LOG_ROOT_DIR}/basic_transformer"
 
 TOKENIZER_TYPE='moses' 
 BPE_TYPE='subword_nmt' 
-BPE_CODES="data/test_data/bpe_codes.txt" 
+BPE_CODES="data/alsg_pc12/bpe_codes.txt" 
 
-EPOCH=10 #Number of epochs
+EPOCH=30 #Number of epochs
 OPTIMIZER='adam' 
 SCHEDULER='inverse_sqrt' #Learning rate growth planner
 LOSS='label_smoothed_cross_entropy' #Loss metric
 ARCHITECTURE='transformer' #Basic transformer
 LEARNING_RATE=5e-4 
-MAX_TOKENS=4096 #Maximum number of tokens in a sentence
+MAX_TOKENS=2048 #Maximum number of tokens in a sentence
 
 SAVE_DIR='/home/jennamansueto/text2gloss/code/models/basic_transformer/checkpoints/'
 
@@ -37,4 +39,6 @@ CUDA_VISIBLE_DEVICES=0,1 fairseq-train $DATA \
         --update-freq 8 \
         --save-interval-updates 10000 \
         --validate-interval-updates 10000 \
-        --save-dir $SAVE_DIR
+        --save-dir $SAVE_DIR \
+        --tensorboard-logdir $LOG_DIR \
+        --patience 5 \
