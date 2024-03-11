@@ -2,11 +2,11 @@
 
 # to make script executable, run chmod +x train.sh 
 # NOTE TO SELF: MAKE PATHS ABSOLUTE
-DATA='/home/jennamansueto/text2gloss/code/data/aslg_pc12/clean/' 
+DATA='/home/lukebabbitt/text2gloss/code/data/aslg_pc12/clean/' 
 SRC_LANG='en' #Source Language
 TGT_LANG='asl' #Target Language
-LOG_ROOT_DIR='/home/jennamansueto/text2gloss/code/models/logs'
-LOG_DIR="${LOG_ROOT_DIR}/basic_transformer"
+LOG_ROOT_DIR='/home/lukebabbitt/text2gloss/code/models/logs'
+LOG_DIR="${LOG_ROOT_DIR}/transformer_from_pretrained_xlm"
 
 TOKENIZER_TYPE='moses' 
 BPE_TYPE='subword_nmt' 
@@ -16,12 +16,16 @@ EPOCH=30 #Number of epochs
 OPTIMIZER='adam' 
 SCHEDULER='inverse_sqrt' #Learning rate growth planner
 LOSS='label_smoothed_cross_entropy' #Loss metric
-ARCHITECTURE='transformer' #Basic transformer
+ARCHITECTURE='transformer_from_pretrained_xlm' # transformer
 LEARNING_RATE=5e-4 
 MAX_TOKENS=2048 #Maximum number of tokens in a sentence
 SHARDS=4
+TASK="translation_from_pretrained_xlm"
 
-SAVE_DIR='/home/jennamansueto/text2gloss/code/models/basic_transformer/checkpoints/'
+SAVE_DIR='/home/lukebabbitt/text2gloss/code/models/transformer_from_pretrained_xlm/checkpoints/'
+
+# need to add --pretrained-xlm-checkpoint
+
 
 #--warmup-updates: How many learning rate warmup steps to use
 CUDA_VISIBLE_DEVICES=0,1 fairseq-train $DATA \
@@ -36,7 +40,6 @@ CUDA_VISIBLE_DEVICES=0,1 fairseq-train $DATA \
         --lr $LEARNING_RATE \
         --criterion $LOSS \
         --share-decoder-input-output-embed \
-        --encoder-learned-pos \
         --update-freq 8 \
         --save-interval-updates 10000 \
         --validate-interval-updates 10000 \
@@ -44,3 +47,4 @@ CUDA_VISIBLE_DEVICES=0,1 fairseq-train $DATA \
         --tensorboard-logdir $LOG_DIR \
         --patience 5 \
         --num-shards $SHARDS \
+        --task $TASK \
