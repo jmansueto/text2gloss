@@ -19,6 +19,7 @@ LOSS='label_smoothed_cross_entropy' #Loss metric
 ARCHITECTURE='transformer' #Basic transformer
 LEARNING_RATE=5e-4 
 MAX_TOKENS=2048 #Maximum number of tokens in a sentence
+SHARDS=4
 
 SAVE_DIR='/home/jennamansueto/text2gloss/code/models/basic_transformer/checkpoints/'
 
@@ -42,3 +43,4 @@ CUDA_VISIBLE_DEVICES=0,1 fairseq-train $DATA \
         --save-dir $SAVE_DIR \
         --tensorboard-logdir $LOG_DIR \
         --patience 5 \
+        --num-shards $SHARDS \
