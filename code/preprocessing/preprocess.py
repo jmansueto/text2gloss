@@ -4,6 +4,7 @@ import subprocess
 import pandas as pd
 from sklearn.model_selection import train_test_split
 from tqdm import tqdm
+import argparse
 
 # Load data from filepath
 def load_data_from_csv(filepath):
@@ -69,13 +70,13 @@ def save_splits(data, outpath, prefix):
 
 
 def run_fairseq_preprocess(pref,
-                        destdir,
-                        source_lang="en",
-                        target_lang="asl",
-                        workers=1,
-                        tokenizer="moses",
-                        bpe_type="subword_nmt",
-                    ):
+                        destdir, task,
+                        source_lang,
+                        target_lang,
+                        workers,
+                        tokenizer,
+                        bpe_type                    
+    ):
     """
     Runs the Fairseq preprocess command with the specified parameters.
 
@@ -95,9 +96,11 @@ def run_fairseq_preprocess(pref,
     if not os.path.exists(destdir):
         os.makedirs(destdir)
 
+
     command = f"fairseq-preprocess --source-lang {source_lang} --target-lang {target_lang} " \
               f"--trainpref {trainpref} --validpref {validpref} --testpref {testpref} --bpe {bpe_type} " \
-              f"--destdir {destdir} --workers {workers} --tokenizer {tokenizer}"
+              f"--destdir {destdir} --workers {workers} --tokenizer {tokenizer} --task {task}"
+
     
     try:
         subprocess.run(command, check=True, shell=True)
@@ -116,10 +119,10 @@ Automatically gennerates the following file structure:
 -----> bpe_codes.txt
 """
 
-def main(filepath = 'data/aslg_pc12/aslg_pc12.csv',
+def main(task, tokenizer, source_lang, workers, target_lang, bpe_type, filepath = 'code/data/phoenix/phoenix.csv',
     num_merge_ops=32000
     ):
-
+    
     base_dir = os.path.dirname(filepath)
 
     print(base_dir)
@@ -144,8 +147,32 @@ def main(filepath = 'data/aslg_pc12/aslg_pc12.csv',
     # Generate BPE codes (based on the training data)
     generate_bpe_codes(os.path.join(split_outpath, "train.en"), bpe_codes_path, num_merge_ops)
 
-    run_fairseq_preprocess(destdir=final_outpath, pref=split_outpath)
+    run_fairseq_preprocess(destdir=final_outpath, 
+                            pref=split_outpath, 
+                            task=task, 
+                            tokenizer=tokenizer, 
+                            source_lang=source_lang,
+                            target_lang=target_lang,
+                            workers=workers,
+                            bpe_type=bpe_type
+                            )
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description="Process data and run Fairseq preprocess.")
+    parser.add_argument("--task", default="translation", help="Name of the model.")
+    parser.add_argument("--tokenizer", default="moses", help="Tokenizer.")
+    parser.add_argument("--source_lang", default="en", help="source_lang.")
+    parser.add_argument("--target_lang", default="asl", help="target_lang.")
+    parser.add_argument("--workers", default=1, help="workers.")
+    parser.add_argument("--bpe_type", default="subword_nmt", help="bpe_type.") 
+    
+    args = parser.parse_args()
+    
+    main(task=args.task, 
+        tokenizer=args.tokenizer, 
+        source_lang=args.source_lang, 
+        target_lang=args.target_lang, 
+        workers=args.workers, 
+        bpe_type=args.bpe_type
+        )
