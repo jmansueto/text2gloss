@@ -1,0 +1,17 @@
+Two preprocessing options:
+
+1. Standard preprocessing (what we have been doing)
+    To do this, just run preprocess.py as before. (BPE still doesn't work)
+
+
+2. Decomposed preprocessing (what we will have to do for more control over the pipeline)
+    To do this, you have to run three different files:
+
+    a. either standard_splits.py or src_pos_splits.py: these files will create the train/test/val splits, 
+    and the latter adds part of speech tags to the source language
+
+    b. apply_bpe: this file takes in a path to a split folder and then generates a new folder where each of 
+    the files has been encoded with BPE
+
+    c. fair_seq_preprocess: this file takes in a path to a (bpe) splits folder, and generates the 'clean' folder
+    which can then be used to train with fairseq
