@@ -155,14 +155,6 @@ Training progress can be monitored using TensorBoard:
 tensorboard --logdir code/models/logs/
 ```
 
-## Key Features
-
-- **Multiple Model Architectures**: Standard, tiny, and pretrained transformer variants
-- **Data Augmentation**: POS-tagging and multilingual training support
-- **Comprehensive Evaluation**: BLEU score evaluation with sacrebleu
-- **Flexible Preprocessing**: Support for different tokenizers and BPE encoding
-- **Low-Resource Optimization**: Specialized approaches for sign language translation
-
 ## Configuration
 
 ### Training Parameters
